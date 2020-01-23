@@ -23,7 +23,7 @@ def APIAnalyticsQueu():
         #sqlquery='select count(d.people_coun) as number_of_people from (select queue_name, max(people_count) as people_coun from QueueCount  where time_stamp > DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL @interval MINUTE) group by queue_name) d group by d.people_coun having d.people_coun >= @threshhold'
         cursor=connection.cursor()
         #cursor.execute('select count(d.people_coun) as number_of_people from (select queue_name, max(people_count) as people_coun from QueueCount  where time_stamp > DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL %s MINUTE) group by queue_name) d group by d.people_coun having d.people_coun >= %s',(i,threshold))
-        cursor.execute('select count(d.people_coun) as number_of_people from (select queue_name, max(people_count) as people_coun from QueueCount  where time_stamp > DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL %s MINUTE) group by queue_name) d where d.people_coun  >= %s',(i,threshold))
+        cursor.execute('select count(d.people_coun) as number_of_people from (select queue_name, max(people_count) as people_coun from QueueCount  where timestamp > DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL %s MINUTE) group by queue_name) d where d.people_coun  >= %s',(i,threshold))
         records=cursor.fetchone()
         dic['intervals']=i
         dic['number']=records
@@ -35,7 +35,8 @@ def APIAnalyticsQueu():
 def max_people_for_each_queue():
     time_r=request.args.get('interval')
     cursor=connection.cursor()
-    cursor.execute('select queue_name,max(people_count) as people_coun from QueueCount  where time_stamp >  DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL %s MINUTE) group by queue_name ',(time_r))
+    tt=5
+    cursor.execute('select queue_name,max(people_count) as people_coun from QueueCount  where timestamp >  DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL %s MINUTE) group by queue_name ',(tt))
     records=cursor.fetchone()
     dic={}
     inter=[]
@@ -89,6 +90,26 @@ def user_insertion():
     else:
         dic['result']='Failed'
     return dic
+
+
+@app.route('/api/quepercent')
+def percent_queue():
+    time_r=request.args.get(interval)
+    cursor=connection.cursor()
+    cursor.execute('select queue_name,max(people_count) as people_coun from QueueCount  where timestamp >  DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL %s MINUTE) group by queue_name ',(time_r))
+    records=cursor.fetchone()
+    dic={}
+    inter=[]
+    for i in records:
+        percent_peopl=(i[1]*100)/len(records)
+        dic={}
+        dic['queue_name']=i[0]
+        dic['count_people']=i[1]
+        dic['percent_peop']=percent_peopl
+        inter.append(dic.copy())
+    dic['queue']=inter
+    return jsonify(dic)
+
 
 
 
