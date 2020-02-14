@@ -6,7 +6,7 @@ import string,random
 
 
 
-connection=mariadb.connect(host='10.130.6.125',user='tescouser',password='tesco@123',database='tesco_express')
+connection=mariadb.connect(host='10.0.0.5',user='tescouser',password='tesco@123',database='tesco_express')
 
 
 
@@ -15,29 +15,29 @@ def page_three(threshold,db,queue_name):
     inter=[]
     di={}
     if queue_name=='Q1':
-        connection=mariadb.connect(host='10.130.6.125',user='tescouser',password='tesco@123',database=db)
+        connection=mariadb.connect(host='10.0.0.5',user='tescouser',password='tesco@123',database=db)
         for i in interval_lis:
             dic={}
             #sqlquery='select count(d.people_coun) as number_of_people from (select queue_name, max(people_count) as people_coun from QueueCount  where time_stamp > DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL @interval MINUTE) group by queue_name) d group by d.people_coun having d.people_coun >= @threshhold'
             cursor=connection.cursor()
             #cursor.execute('select count(d.people_coun) as number_of_people from (select queue_name, max(people_count) as people_coun from QueueCount  where time_stamp > DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL %s MINUTE) group by queue_name) d group by d.people_coun having d.people_coun >= %s',(i,threshold))
-            cursor.execute("""select count(d.people_coun) as number_of_people from (select queue_name, max(people_count) as people_coun from QueueCount  where time_stamp > DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL %s MINUTE) group by queue_name) d where d.people_coun  >= %s and REPLACE(d.Queue_Name,'Q','') between '1' and '5' """,(i,threshold))
-            records=cursor.fetchall()
+            cursor.execute("""select count(d.people_coun) as number_of_people from (select queue_name, max(people_count) as people_coun from QueueCount  where time_stamp > DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL %s MINUTE) group by queue_name) d where d.people_coun  >= %s and REPLACE(d.queue_name,'Q','') between '1' and '5' """,(i,threshold))
+            records=cursor.fetchone()
             print(records)
             dic['intervals']=i
-            dic['number']=records
+            dic['number']=records[0]
             inter.append(dic.copy())
         print(inter)
         di['inter']=inter
         return jsonify(di)    
     else:
-        connection=mariadb.connect(host='10.130.6.125',user='tescouser',password='tesco@123',database=db)
+        connection=mariadb.connect(host='10.0.0.5',user='tescouser',password='tesco@123',database=db)
         for i in interval_lis:
             dic={}
             #sqlquery='select count(d.people_coun) as number_of_people from (select queue_name, max(people_count) as people_coun from QueueCount  where time_stamp > DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL @interval MINUTE) group by queue_name) d group by d.people_coun having d.people_coun >= @threshhold'
             cursor=connection.cursor()
             #cursor.execute('select count(d.people_coun) as number_of_people from (select queue_name, max(people_count) as people_coun from QueueCount  where time_stamp > DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL %s MINUTE) group by queue_name) d group by d.people_coun having d.people_coun >= %s',(i,threshold))
-            cursor.execute("""select count(d.people_coun) as number_of_people from (select queue_name, max(people_count) as people_coun from QueueCount  where time_stamp > DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL %s MINUTE) group by queue_name) d where d.people_coun  >= %s and REPLACE(p.Queue_Name,'Q','') between '1' and '5' """,(i,threshold))
+            cursor.execute("""select count(d.people_coun) as number_of_people from (select queue_name, max(people_count) as people_coun from QueueCount  where time_stamp > DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL %s MINUTE) group by queue_name) d where d.people_coun  >= %s and REPLACE(d.queue_name,'Q','') between '6' and '9' """,(i,threshold))
             records=cursor.fetchall()
             dic['intervals']=i
             dic['number']=records
@@ -47,11 +47,11 @@ def page_three(threshold,db,queue_name):
         
 
 def page_one(interval,db,queue_name):
-    connection=mariadb.connect(host='10.130.6.125',user='tescouser',password='tesco@123',database=db)
+    connection=mariadb.connect(host='10.0.0.5',user='tescouser',password='tesco@123',database=db)
     cursor=connection.cursor()
     
     if queue_name=='Q1': 
-        cursor.execute("""select * from (select Queue_Name,max(people_count) as people_coun from QueueCount  where time_stamp >  DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL 50 MINUTE) group by Queue_Name ) as p where REPLACE(p.Queue_Name,'Q','') between '1' and '5' """)
+        cursor.execute("""select * from (select Queue_Name,max(people_count) as people_coun from QueueCount  where time_stamp >  DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL %s MINUTE) group by Queue_Name ) as p where REPLACE(p.Queue_Name,'Q','') between '1' and '5' """,(interval,))
         records=cursor.fetchall()
         inter=[]
         di={}
@@ -64,7 +64,7 @@ def page_one(interval,db,queue_name):
         di['queue']=inter
         return jsonify(di)   
     else:
-        cursor.execute("""select * from (select Queue_Name,max(people_count) as people_coun from QueueCount  where time_stamp >  DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL %s MINUTE) group by Queue_Name ) as p where REPLACE(p.Queue_Name,'Q','') between 'Q1' and 'Q5' """,(interval))
+        cursor.execute("""select * from (select Queue_Name,max(people_count) as people_coun from QueueCount  where time_stamp >  DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL %s MINUTE) group by Queue_Name ) as p where REPLACE(p.Queue_Name,'Q','') between '6' and '9' """,(interval,))
         records=cursor.fetchall()
         inter=[]
         di={}
@@ -78,13 +78,15 @@ def page_one(interval,db,queue_name):
 
 
 def page_two(interval,db,queue_name):
-    connection=mariadb.connect(host='10.130.6.125',user='tescouser',password='tesco@123',database=db)
+    print(interval)
+    connection=mariadb.connect(host='10.0.0.5',user='tescouser',password='tesco@123',database=db)
     cursor=connection.cursor()
     if queue_name=='Q1': 
-        cursor.execute("""select * from (select Queue_Name,max(people_count) as people_coun from QueueCount  where time_stamp >  DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL 50 MINUTE) group by Queue_Name ) as p where REPLACE(p.Queue_Name,'Q','') between '1' and '5' """)
+        cursor.execute("""select * from (select Queue_Name,max(people_count) as people_coun from QueueCount  where time_stamp >  DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL %s MINUTE) group by Queue_Name ) as p where REPLACE(p.Queue_Name,'Q','') between '1' and '5' """,(interval,))
         records=cursor.fetchall()
         inter=[]
         di={}
+        print(records)
         for i in records:
             percent_peopl=(i[1]*100)/len(records)
             dic={}
@@ -95,7 +97,7 @@ def page_two(interval,db,queue_name):
         di['queue']=inter
         return jsonify(di)   
     else:
-        cursor.execute("""select * from (select Queue_Name,max(people_count) as people_coun from QueueCount  where time_stamp >  DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL %s MINUTE) group by Queue_Name ) as p where REPLACE(p.Queue_Name,'Q','') between 'Q1' and 'Q5' """,(interval))
+        cursor.execute("""select * from (select Queue_Name,max(people_count) as people_coun from QueueCount  where time_stamp >  DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL %s MINUTE) group by Queue_Name ) as p where REPLACE(p.Queue_Name,'Q','') between '6' and '9' """,(interval,))
         records=cursor.fetchall()
         inter=[]
         di={}

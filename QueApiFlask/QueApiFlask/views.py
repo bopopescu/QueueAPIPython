@@ -35,7 +35,7 @@ def max_people_for_each_queue():
     time_r=request.args.get('interval')
     cursor=connection.cursor()
     tt=5
-    cursor.execute('select queue_name,max(people_count) as people_coun from QueueCount  where timestamp >  DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL %s MINUTE) group by queue_name ',(tt))
+    cursor.execute('select queue_name,max(people_count) as people_coun from QueueCount  where timestamp >  DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL %s MINUTE) group by queue_name ',(tt,))
     records=cursor.fetchone()
     dic={}
     inter=[]
@@ -63,19 +63,27 @@ def select_home_queues():
         return(pone(interval,db,queue_name))
     
 
-@app.route('/api/user')
+@app.route('/api/user',methods=['POST'])
 def user_insertion():
-    letters=string.ascii_lowercase
-    user_c=''.join(random.sample(letters,4))
-    input_key=request.args.get(Key)
-    cursor=connection.cursor()
-    dic={}
-    cursor.execute('insert into QueueUser(UserName,FCM) values(%s,%s)',(user_c,input_key))
-    if(cursor.rowcount==1):
-        dic['result']='Success'
-    else:
-        dic['result']='Failed'
-    return dic
+    connection=mariadb.connect(host='10.0.0.5',user='tescouser',password='tesco@123',database='tesco_users')
+    if request.method=='POST':
+        
+        json_key=request.get_json()
+        letters=string.ascii_lowercase
+        user_c=''.join(random.sample(letters,4))
+        print(json_key)
+        input_key=json_key['key']
+        cursor=connection.cursor()
+        print(input_key)
+        dic={}
+        cursor.execute('insert into fcm_store(UserName,FCM) values(%s,%s)',(user_c,input_key))
+        connection.commit()
+        if(cursor.rowcount==1):
+            dic['result']='Success'
+        else:
+            dic['result']='Failed'
+        return dic
+    return "It is not Post Request"
 
 
 @app.route('/api/quepercent')
