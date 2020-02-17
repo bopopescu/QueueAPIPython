@@ -65,7 +65,7 @@ def select_home_queues():
 
 @app.route('/api/user',methods=['POST'])
 def user_insertion():
-    connection=mariadb.connect(host='10.0.0.5',user='tescouser',password='tesco@123',database='tesco_users')
+    connection=mariadb.connect(host='52.172.157.210',user='tescouser',password='tesco@123',database='tesco_users')
     if request.method=='POST':
         
         json_key=request.get_json()
