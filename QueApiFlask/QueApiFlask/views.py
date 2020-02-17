@@ -82,7 +82,7 @@ def user_insertion():
             dic['result']='Success'
         else:
             dic['result']='Failed'
-        return dic
+        return jsonify(dic)
     return "It is not Post Request"
 
 
