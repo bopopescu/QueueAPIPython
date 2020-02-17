@@ -43,7 +43,7 @@ def page_three(threshold,db,queue_name):
             dic['number']=records[0]
             inter.append(dic.copy())
         di['inter']=inter
-        return jsonify(di)   
+        return jsonify(di)
         
 
 def page_one(interval,db,queue_name):
@@ -58,7 +58,7 @@ def page_one(interval,db,queue_name):
         print(records)
         for i in records:
             dic={}
-            dic['Queue_Name']=i[0]
+            dic['queue_name']=i[0]
             dic['people_count']=i[1]
             inter.append(dic.copy())
         di['queue']=inter
@@ -70,7 +70,7 @@ def page_one(interval,db,queue_name):
         di={}
         for i in records:
             dic={}
-            dic['Queue_Name']=i[0]
+            dic['queue_name']=i[0]
             dic['people_count']=i[1]
             inter.append(dic.copy())
         di['queue']=inter
