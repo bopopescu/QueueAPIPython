@@ -83,7 +83,7 @@ def user_insertion():
         else:
             dic['result']='Failed'
         return jsonify(dic)
-    return "It is not Post Request"
+    return jsonify("It is not Post Request")
 
 
 @app.route('/api/quepercent')

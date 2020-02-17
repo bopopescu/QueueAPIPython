@@ -40,7 +40,7 @@ def page_three(threshold,db,queue_name):
             cursor.execute("""select count(d.people_coun) as number_of_people from (select queue_name, max(people_count) as people_coun from QueueCount  where time_stamp > DATE_SUB(CURRENT_TIMESTAMP(),INTERVAL %s MINUTE) group by queue_name) d where d.people_coun  >= %s and REPLACE(d.queue_name,'Q','') between '6' and '9' """,(i,threshold))
             records=cursor.fetchall()
             dic['intervals']=i
-            dic['number']=records
+            dic['number']=records[0]
             inter.append(dic.copy())
         di['inter']=inter
         return jsonify(di)   
