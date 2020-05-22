@@ -22,10 +22,10 @@ def APIAnalyticsQueu():
         db="tesco_express"
         return(pg(threshold,db,queue_name))
     elif store_type=='hyper':
-        db="tesco_hyper"
+        db="tesco_express"
         return(pg(threshold,db,queue_name))
     else:
-        db="tesco_super"
+        db="tesco_express"
         return(pg(threshold,db,queue_name))
 
     
@@ -56,10 +56,10 @@ def select_home_queues():
         db="tesco_express"
         return(pone(interval,db,queue_name))
     elif store_type=='hyper':
-        db="tesco_hyper"
+        db="tesco_express"
         return(pone(interval,db,queue_name))
     else:
-        db="tesco_super"
+        db="tesco_express"
         return(pone(interval,db,queue_name))
     
 
@@ -95,10 +95,10 @@ def percent_queue():
         db="tesco_express"
         return(ptwo(interval,db,queue_name))
     elif store_type=='hyper':
-        db="tesco_hyper"
+        db="tesco_express"
         return(ptwo(interval,db,queue_name))
     else:
-        db="tesco_super"
+        db="tesco_express"
         return(ptwo(interval,db,queue_name))
 
 
